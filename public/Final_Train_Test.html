@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch Train Data</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .card {
+        box-shadow: 0 1px 7px 0 rgba(0, 0, 0, 0.4),
+          0 1px 7px 0 rgba(0, 0, 0, 0.4);
+        margin: 2.5rem 0;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 10px;
+        width: 80%;
+        margin: 2.5rem auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .card__header {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+      .card__title {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+      .card__time {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin: 1rem 0;
+      }
+      .card__fare {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin: 1rem 0;
+      }
+      .fare-box {
+        background-color: #e8f5e9;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        width: 30%;
+      }
+      .fare-box h4 {
+        margin: 0;
+      }
+      .fare-box p {
+        margin: 5px 0;
+      }
+      .book-button {
+        background-color: blue;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        align-self: center;
+        margin-top: 20px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="trainCards"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const apiKeys = [
+        "8ac47c8590msha8bee0cdc582d25p14ff9ajsn7e2158a2c35c",
+        "7f768dff4fmshb6f0b04a0662b8fp156c96jsn6287675996a0",
+        // Add more API keys as needed
+      ];
+
+      let apiCallCount = 0;
+      let currentApiKeyIndex = 0;
+
+      async function fetchTrainData() {
+        const fromStationCode = localStorage.getItem("fromStationCode");
+        const toStationCode = localStorage.getItem("toStationCode");
+        const dateOfJourney = localStorage.getItem("dateOfJourney");
+
+        const options = {
+          method: "GET",
+          url: "https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations",
+          params: {
+            fromStationCode: fromStationCode,
+            toStationCode: toStationCode,
+            dateOfJourney: dateOfJourney,
+          },
+          headers: {
+            "X-RapidAPI-Key":
+              "8fb37b6be2msh44d7a97669a104cp11db0cjsn786cbf881ef8",
+            "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
+          },
+        };
+
+        try {
+          const response = await axios.request(options);
+          const trainCards = document.getElementById("trainCards");
+          trainCards.innerHTML = ""; // Clear previous data
+
+          if (!response.data.data || response.data.data.length === 0) {
+            trainCards.innerHTML =
+              "<p>No trains found for the selected route and date.</p>";
+            return;
+          }
+
+          const trainsInfo = response.data.data.reduce((info, train) => {
+            info.push({
+              trainNumber: train.train_number,
+              trainName: train.train_name,
+              fromStation: `${train.from_std} ${train.from_sta}`,
+              toStation: `${train.to_std} ${train.to_sta}`,
+              duration: train.duration,
+              classTypes: train.class_type,
+            });
+            return info;
+          }, []);
+
+          for (const trainInfo of trainsInfo) {
+            const {
+              trainNumber,
+              trainName,
+              fromStation,
+              toStation,
+              duration,
+              classTypes,
+            } = trainInfo;
+
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const header = document.createElement("div");
+            header.className = "card__header";
+            header.innerHTML = `
+                  <div class="card__title">${trainNumber} - ${trainName}</div>
+              `;
+            card.appendChild(header);
+
+            const times = document.createElement("div");
+            times.className = "card__time";
+            times.innerHTML = `
+                  <div>${fromStation}</div>
+                  <div>--- ${duration} ---</div>
+                  <div>${toStation}</div>
+              `;
+            card.appendChild(times);
+
+            const fares = document.createElement("div");
+            fares.className = "card__fare";
+            const fareAndAvailability = await fetchFareAndAvailability(
+              trainNumber,
+              fromStation,
+              toStation,
+              dateOfJourney,
+              classTypes
+            );
+            // const fareAndAvailability = await fetchFareAndAvailabilityDummy(
+            //   trainNumber,
+            //   classTypes
+            // );
+            fareAndAvailability.forEach((fareData) => {
+              const {
+                classType,
+                total_fare,
+                confirm_probability,
+                current_status,
+              } = fareData;
+              const fareBox = document.createElement("div");
+              fareBox.className = "fare-box";
+              let statusColor;
+              switch (confirm_probability) {
+                case "High":
+                  statusColor = "green";
+                  break;
+                case "Med":
+                  statusColor = "orange";
+                  break;
+                case "Low":
+                  statusColor = "red";
+                  break;
+                default:
+                  statusColor = "black";
+              }
+              fareBox.innerHTML = `
+                      <h4>${classType}</h4>
+                      <p>Total Fare: ₹${total_fare}</p>
+                      <p style="color: ${statusColor};">Status: ${current_status}</p>
+                  `;
+              fares.appendChild(fareBox);
+            });
+            card.appendChild(fares);
+
+            const bookButton = document.createElement("button");
+            bookButton.className = "book-button";
+            bookButton.textContent = "Book Now";
+            card.appendChild(bookButton);
+
+            trainCards.appendChild(card);
+          }
+        } catch (error) {
+          console.error("Error fetching train data:", error);
+          document.getElementById("trainCards").innerHTML =
+            "<p>Error fetching train data. Please try again later.</p>";
+        }
+      }
+      async function fetchFareAndAvailability(
+        trainNo,
+        fromStation,
+        toStation,
+        date,
+        classTypes
+      ) {
+        if (apiCallCount >= 20) {
+          apiCallCount = 0;
+          currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+        }
+
+        apiCallCount++;
+
+        const promises = classTypes.map(async (classType) => {
+          const options = {
+            method: "GET",
+            url: "https://irctc1.p.rapidapi.com/api/v1/checkSeatAvailability",
+            params: {
+              classType: classType,
+              fromStationCode: fromStation,
+              quota: "GN",
+              toStationCode: toStation,
+              trainNo: trainNo,
+              date: date,
+            },
+            headers: {
+              "X-RapidAPI-Key": apiKeys[currentApiKeyIndex],
+              "X-RapidAPI-Host": "irctc1.p.rapidapi.com",
+            },
+          };
+
+          try {
+            const response = await axios.request(options);
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            const data = response.data.data[0];
+            return {
+              classType: classType,
+              total_fare: data.total_fare,
+              confirm_probability: data.confirm_probability,
+              current_status: data.current_status,
+            };
+          } catch (error) {
+            console.error(
+              `Error fetching seat availability for ${classType}:`,
+              error
+            );
+            return {
+              classType: classType,
+              total_fare: Math.floor(Math.random() * 1000), // Random fare value
+              confirm_probability: "High",
+              current_status: Math.floor(Math.random() * 50) + "/AVL",
+            };
+          }
+        });
+
+        return Promise.all(promises);
+      }
+      async function fetchFareAndAvailabilityDummy(trainNumber, classType) {
+        // This is a dummy function that returns mock data
+        return {
+          total_fare: Math.floor(Math.random() * 10000), // Random fare value
+          confirm_probability: "High",
+          current_status: "25/AVL",
+        };
+      }
+
+      document.addEventListener("DOMContentLoaded", fetchTrainData);
+    </script>
+  </body>
+</html>

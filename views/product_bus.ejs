@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Razorpay Web-Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .card h2 {
+            margin: 0 0 20px;
+        }
+        .card .price {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+        .card .book-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="card">
+        <h2 id="bus-name">Bus Name</h2>
+        <div class="price" id="price">₹0</div>
+        <button class="book-button" onclick="openPaymentGateway()">Book</button>
+        <input type="hidden" name="name" id="hidden-name" value="">
+        <input type="hidden" name="amount" id="hidden-amount" value="">
+        <input type="hidden" name="description" value="Bus Ticket Booking">
+    </div>
+    <script>
+        $(document).ready(function(){
+            const name = localStorage.getItem('name');
+            const fare = localStorage.getItem('fare');
+
+            $('#bus-name').text(name);
+            $('#price').text(`₹${fare}`);
+            $('#hidden-name').val(name);
+            $('#hidden-amount').val(fare);
+
+            $('.pay-form').submit(function(e){
+                e.preventDefault();
+                openPaymentGateway();
+            });
+        });
+
+        function openPaymentGateway(){
+            const name = $('#hidden-name').val();
+            const amount = $('#hidden-amount').val();
+            const description = 'Bus Ticket Booking';
+
+            $.ajax({
+                url: "/createOrder",
+                type: "POST",
+                data: {
+                    name: name,
+                    amount: amount,
+                    description: description
+                },
+                success: function(res){
+                    if(res.success){
+                        var options = {
+                            "key": res.key_id,
+                            "amount": res.amount,
+                            "currency": "INR",
+                            "name": res.product_name,
+                            "description": res.description,
+                            "image": "https://dummyimage.com/600x400/000/fff",
+                            "order_id": res.order_id,
+                            "handler": function (response){
+                                alert("Payment Succeeded");
+                                window.location.href = "/Bus_HomePage.html";
+                            },
+                            "prefill": {
+                                "contact": res.contact,
+                                "name": res.name,
+                                "email": res.email
+                            },
+                            "notes": {
+                                "description": res.description
+                            },
+                            "theme": {
+                                "color": "#2300a3"
+                            }
+                        };
+                        var razorpayObject = new Razorpay(options);
+                        razorpayObject.on('payment.failed', function (response){
+                            alert("Payment Failed");
+                        });
+                        razorpayObject.open();
+                    } else {
+                        alert(res.msg);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

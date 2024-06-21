@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'sans-serif';
+}
+
+body {
+    background-image: url(TravelImg.jpg);
+    color: #020410;
+    background-size: cover;
+}
+
+.div-nav {
+    width: 355px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e4e4e4;
+    display: inline-flex;
+    color: #e4e4e4;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.div-nav:hover {
+    background-color: #020410;
+    color: #020410;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 12.5%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.navbar a {
+    position: relative;
+    font-size: 16px;
+    color: #121212;
+    text-decoration: none;
+    font-weight: 500;
+    margin-right: 30px;
+}
+
+.navbar a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 2px;
+    background: #e4e4e4;
+    border-radius: 5px;
+    transform: translateY(10);
+    opacity: 0;
+    transition: .5s;
+}
+
+.navbar a:hover::after {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.search-bar {
+    width: 250px;
+    height: 45px;
+    background: transparent;
+    border: 2px solid #e4e4e4;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #020410;
+    padding-left: 10px;
+}
+
+.search-bar input::placeholder {
+    color: #020410;
+}
+
+.search-bar button {
+    width: 40px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.search-bar button i {
+    font-size: 22px;
+    color: #020410;
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 890px;
+    animation: slideImages 50s ease-in-out infinite;
+    background-size: cover;
+    margin-top: 20px;
+}
+
+/* @keyframes slideImages {
+    0% { background-image: url('TravelImg.jpeg'); }
+    25% { background-image: url('bg6.avif'); }
+    50% { background-image: url('bg3.jpeg'); }
+    75% { background-image: url('bg4.jpeg'); }
+    100% { background-image: url('background.jpg'); }
+} */
+
+.content .logo {
+    font-size: 30px;
+}
+
+.text-sci h2 {
+    font-size: 40px;
+    line-height: 1;
+}
+
+.text-sci h2 span {
+    font-size: 25px;
+}
+
+.text-sci p {
+    font-size: 16px;
+    margin: 20px 0;
+}
+
+.social-icons a i {
+    font-size: 22px;
+    color: #e4e4e4;
+    margin-right: 10px;
+    transition: .5s ease;
+}
+
+.social-icons a:hover i {
+    transform: scale(1.2);
+}
+
+.form-box h2 {
+    font-size: 32px;
+    text-align: center;
+}
+
+.form-box .input-box {
+    color: #020410;
+    width: 340px;
+    height: 50px;
+    border-bottom: 2px solid #e4e4e4;
+    margin: 20px 0;
+}
+
+.input-box input {
+    font-size: 15px;
+    color: #020410;
+    width: 100%;
+    height: 60%;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.btn {
+    position: relative;
+    margin-top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 45px;
+    background: #c4103d;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #e4e4e4;
+    font-weight: 500;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+}
+
+.search-wrapper {
+    color: #020410;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 50px;
+    margin-bottom: 50px;
+    width: 100%;
+    height: 100%;
+}
+
+.search-wrapper form {
+    background-color: rgba(255,255,255,0.3);
+    backdrop-filter: blur(2px);
+    border: 4px solid black;
+    border-radius: 15px;
+    padding: 50px 20px 20px 20px;
+    color: #020410;
+    position: absolute;
+    top: 330px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 60%; /* Adjust width as needed */
+    height: 350px;
+}
+
+.dropdown {
+    margin: 10px 0;
+    color: #e4e4e4;
+}
+
+.dropdown label {
+    color: #020410;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.dropdown select,
+.dropdown input[type="date"] {
+    width: 250px;
+    padding: 10px;
+    border: 1px solid #020410; /* Adjust border color if needed */
+    border-radius: 8px; /* Make dropdowns rounder */
+    background: rgba(255, 255, 255, 0.1); /* Add semi-transparent white background */
+    backdrop-filter: blur(10px); /* Add blur effect */
+    color: #020410;
+}
+
+.dropdown:not(:last-child) {
+    margin-right: 20px; /* Add space between dropdowns */
+}
+
+.div-nav {
+    border-radius:10px;
+    border: 2px solid #0f0f0f;
+    display: inline-block;
+    width: 500px;
+    height: 50px;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+.div-nav a {
+    color: white; /* Set text color to white */
+    text-decoration: none;
+}
+
+.transport-hub {
+    position: absolute;
+    left: 170px;
+    top:150px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.transport-hub h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.transport-hub p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+}
+
+.social-icons a {
+    margin: 0 10px;
+}
+
+.social-icons a i {
+    color: #020410;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover i {
+    color: #c4103d;
+}

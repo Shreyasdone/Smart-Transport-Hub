@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Travel Website</title>
+</head>
+<body>
+    <header class="header">
+        <div class="div-nav"><a href="Train_Homepage.html">Train</a></div>
+        <div class="div-nav"><a href="Flight_HomePage.html">Flight</a></div>
+        <div class="div-nav"><a href="Bus_HomePage.html">Bus</a></div>
+    </header>
+    <div class="container">
+        <div class="transport-hub">
+            <h2>Welcome to the Transport Hub</h2>
+            <p>Discover the best way to travel by train, flight, or bus. Find the most suitable routes, check schedules, and book your tickets easily.</p>
+            <div class="social-icons">
+                <a href="#"><i class='bx bxl-facebook'></i></a>
+                <a href="#"><i class='bx bxl-twitter'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+                <a href="#"><i class='bx bxl-linkedin'></i></a>
+            </div>
+        </div>
+        <div class="search-wrapper">
+            <form id="searchForm">
+                <div class="dropdown">
+                    <label for="From">From:</label>
+                    <select name="From" id="From" required>
+                        <option value="">Select City</option>
+                        <option value="Chh. Sambhajinagar">Chh. Sambhajinagar</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Kolhapur">Kolhapur</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Nagpur">Nagpur</option>
+                    </select>                    
+                </div>
+                <div class="dropdown">
+                    <label for="To">To:</label>
+                    <select name="To" id="To" required>
+                        <option value="">Select City</option>
+                        <option value="Chh. Sambhajinagar">Chh. Sambhajinagar</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Kolhapur">Kolhapur</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Nagpur">Nagpur</option>
+                        <option value="Nashik">Nashik</option>
+                    </select>                    
+                </div>
+                <div class="dropdown">
+                    <label for="date">Date:</label>
+                    <input type="date" name="date" id="date" required>
+                </div>
+                <button id="fetchButton" class="btn" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const origin = document.getElementById("From").value;
+            const destination = document.getElementById("To").value;
+
+            if (!origin || !destination) {
+                alert('Please provide both origin and destination.');
+                return;
+            }
+
+            localStorage.setItem('from', origin);
+            localStorage.setItem('to', destination);
+
+            window.location.href = 'Bus_With_Payment.html'; // Navigate to the Bus Data page
+        });
+    </script>
+</body>
+</html>

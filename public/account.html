@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Webleb</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="account.css" />
+  </head>
+  <body>
+    <div class="section">
+      <div class="container">
+        <div class="row full-height justify-content-center">
+          <div class="col-12 text-center align-self-center py-5">
+            <div class="section pb-5 pt-5 pt-sm-2 text-center">
+              <h6 class="mb-0 pb-3">
+                <span>Log In </span><span>Sign Up</span>
+              </h6>
+              <input
+                class="checkbox"
+                type="checkbox"
+                id="reg-log"
+                name="reg-log"
+              />
+              <label for="reg-log"></label>
+              <div class="card-3d-wrap mx-auto">
+                <div class="card-3d-wrapper">
+                  <div class="card-front">
+                    <div class="center-wrap">
+                      <div class="section text-center">
+                        <h4 class="mb-4 pb-3">Log In</h4>
+                        <div class="form-group">
+                          <input
+                            type="email"
+                            id="login_email"
+                            class="form-style"
+                            placeholder="Email"
+                          />
+                          <i class="input-icon uil uil-at"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input
+                            type="password"
+                            id="login_password"
+                            class="form-style"
+                            placeholder="Password"
+                          />
+                          <i class="input-icon uil uil-lock-alt"></i>
+                        </div>
+                        <a href="" id="login" name="login" class="btn mt-4"
+                          >Login</a
+                        >
+                        <p class="mb-0 mt-4 text-center">
+                          <a href="" class="link">Forgot your password?</a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-back">
+                    <div class="center-wrap">
+                      <div class="section text-center">
+                        <h4 class="mb-3 pb-3">Sign Up</h4>
+                        <div class="form-group mt-2">
+                          <input
+                            type="email"
+                            id="email"
+                            class="form-style"
+                            placeholder="Email"
+                          />
+                          <i class="input-icon uil uil-at"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input
+                            type="password"
+                            id="password"
+                            class="form-style"
+                            placeholder="Password"
+                          />
+                          <i class="input-icon uil uil-lock-alt"></i>
+                        </div>
+                        <div class="form-group mt-2">
+                          <input
+                            type="password"
+                            id="confirm_password"
+                            class="form-style"
+                            placeholder="Confirm Password"
+                          />
+                          <i class="input-icon uil uil-lock-alt"></i>
+                        </div>
+                        <a
+                          href=""
+                          id="register"
+                          name="register"
+                          class="btn mt-4"
+                          >Register</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyC86hi6MZgPSmh-6sWWsAjmRxiWR_Fs3rQ",
+      authDomain: "login-with-firebase-24073.firebaseapp.com",
+      databaseURL:
+        "https://login-with-firebase-24073-default-rtdb.firebaseio.com",
+      projectId: "login-with-firebase-24073",
+      storageBucket: "login-with-firebase-24073.appspot.com",
+      messagingSenderId: "171877325282",
+      appId: "1:171877325282:web:69fa3f4d56dbe7ed09c1bb",
+      measurementId: "G-40W7PD2NHE",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth();
+    console.log(app);
+
+    //----- New Registration code start
+    document
+      .getElementById("register")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission behavior
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirm_password").value;
+
+        // Check if password and confirm password match
+        if (password !== confirmPassword) {
+          alert("Passwords do not match!");
+          return; // Exit registration process if passwords do not match
+        }
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user);
+            alert("Registration successful!");
+            // Hide registration form and show login form after successful registration
+
+            document.querySelector(".card-back").classList.remove("active");
+            document.querySelector(".card-front").classList.add("active");
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            console.log(errorMessage);
+            alert(errorMessage);
+          });
+      });
+
+    document
+      .getElementById("login")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission behavior
+        var email = document.getElementById("login_email").value;
+        var password = document.getElementById("login_password").value;
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user);
+            alert(user.email + " logged in successfully!");
+            window.location.href = 'Bus_HomePage.html';
+            // document.getElementById("logout").style.display = "block";
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            console.log(errorMessage);
+            alert(errorMessage);
+          });
+      });
+
+    // Switch to Registration Form
+    document
+      .getElementById("login")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission behavior
+        // Show registration form and hide login form
+        document.querySelector(".card-back").classList.add("active");
+        document.querySelector(".card-front").classList.remove("active");
+      });
+
+    document
+      .getElementById("logout")
+      .addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default link behavior
+        signOut(auth)
+          .then(() => {
+            console.log("Sign-out successful.");
+            alert("Sign-out successful.");
+            document.getElementById("logout").style.display = "none";
+          })
+          .catch((error) => {
+            console.log("Error signing out:", error);
+            alert("Error signing out. Please try again.");
+          });
+      });
+    //----- End
+  </script>
+</html>

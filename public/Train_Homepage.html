@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Travel Website</title>
+</head>
+<body>
+    <header class="header">
+        <div class="div-nav"><a href="Train_Homepage.html">Train</a></div>
+        <div class="div-nav"><a href="Flight_HomePage.html">Flight</a></div>
+        <div class="div-nav"><a href="Bus_HomePage.html">Bus</a></div>
+    </header>
+    <div class="container">
+        <div class="transport-hub">
+            <h2>Welcome to the Transport Hub</h2>
+            <p>Discover the best way to travel by train, flight, or bus. Find the most suitable routes, check schedules, and book your tickets easily.</p>
+            <div class="social-icons">
+                <a href="#"><i class='bx bxl-facebook'></i></a>
+                <a href="#"><i class='bx bxl-twitter'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+                <a href="#"><i class='bx bxl-linkedin'></i></a>
+            </div>
+        </div>
+        <div class="search-wrapper">
+            <form id="searchForm">
+                <div class="dropdown">
+                    <label for="from">From:</label>
+                    <select name="from" id="fromStationCode" required>
+                        <option value="">Select City</option>
+                        <option value="MRJ">Miraj</option>
+                        <option value="PUNE">Pune</option>
+                        <option value="KOP">Kolhapur</option>
+                        <option value="MMCT">Mumbai</option>
+                        <option value="NGP">Nagpur</option>
+                    </select>
+                </div>
+                <div class="dropdown">
+                    <label for="to">To:</label>
+                    <select name="to" id="toStationCode" required>
+                        <option value="">Select City</option>
+                        <option value="MRJ">Miraj</option>
+                        <option value="PUNE">Pune</option>
+                        <option value="KOP">Kolhapur</option>
+                        <option value="MMCT">Mumbai</option>
+                        <option value="NGP">Nagpur</option>
+                    </select>
+                </div>
+                <div class="dropdown">
+                    <label for="date">Date:</label>
+                    <input type="date" name="date" id="dateOfJourney" required>
+                </div>
+                <button id="fetchButton" class="btn" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fromStationCode = document.getElementById("fromStationCode").value;
+            const toStationCode = document.getElementById("toStationCode").value;
+            const dateOfJourney = document.getElementById("dateOfJourney").value;
+
+            localStorage.setItem('fromStationCode', fromStationCode);
+            localStorage.setItem('toStationCode', toStationCode);
+            localStorage.setItem('dateOfJourney', dateOfJourney);
+
+            window.location.href = 'Final_Train.html';
+        });
+    </script>
+</body>
+</html>

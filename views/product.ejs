@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 7px 0 rgba(0, 0, 0, .4), 0 1px 7px 0 rgba(0, 0, 0, .4);
+            margin: 2.5rem 0;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 10px;
+            width: 80%;
+            margin: 2.5rem auto;
+            flex-direction: row;
+        }
+        .detail {
+            margin: 0 1rem;
+            text-align: center;
+        }
+        .price-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .price {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .book-button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <!-- Include the Razorpay script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <input type="hidden" name="name" id="hidden-name" value="Product Name">
+    <input type="hidden" name="amount" id="hidden-amount" value="">
+    <input type="hidden" name="description" value="Flight Ticket Booking">
+    <div id="productDetails"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const airline = localStorage.getItem('airline') || 'Unknown Airline';
+            const from = localStorage.getItem('from') || 'Unknown Departure';
+            const to = localStorage.getItem('to') || 'Unknown Destination';
+            const departure = localStorage.getItem('departure') || 'Unknown Departure Time';
+            const arrival = localStorage.getItem('arrival') || 'Unknown Arrival Time';
+            const price = (localStorage.getItem('price') || '0').replace('₹', ''); // Removing ₹ symbol for numeric value
+
+            document.getElementById('hidden-amount').value = price;
+
+            const productDetails = document.getElementById('productDetails');
+            productDetails.innerHTML = `
+                <div class="card">
+                    <div class="detail">Airline: ${airline}</div>
+                    <div class="detail">From: ${from}</div>
+                    <div class="detail">To: ${to}</div>
+                    <div class="detail">Departure: ${departure}</div>
+                    <div class="detail">Arrival: ${arrival}</div>
+                    <div class="detail">Price: ₹${price}</div>
+                    <div class="price-button">
+                        <button class="book-button" onclick="initiatePayment()">Proceed to Payment</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        function initiatePayment() {
+            const name = document.getElementById('hidden-name').value;
+            const amount = document.getElementById('hidden-amount').value;
+            const description = document.querySelector('input[name="description"]').value;
+
+            $.ajax({
+                url: "/createOrder",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    name: name,
+                    amount: amount,
+                    description: description
+                }),
+                success: function(res) {
+                    if(res.success) {
+                        var options = {
+                            "key": res.key_id,
+                            "amount": res.amount,
+                            "currency": "INR",
+                            "name": res.product_name,
+                            "description": res.description,
+                            "image": "https://dummyimage.com/600x400/000/fff",
+                            "order_id": res.order_id,
+                            "handler": function (response){
+                                alert("Payment Succeeded");
+								window.location.href = "/Flight_HomePage.html";
+                            },
+                            "prefill": {
+                                "contact": res.contact,
+                                "name": res.name,
+                                "email": res.email
+                            },
+                            "notes": {
+                                "description": res.description
+                            },
+                            "theme": {
+                                "color": "#2300a3"
+                            }
+                        };
+                        var razorpayObject = new Razorpay(options);
+                        razorpayObject.on('payment.failed', function (response){
+                            alert("Payment Failed");
+                        });
+                        razorpayObject.open();
+                    } else {
+                        alert(res.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error creating order:", xhr.responseText);
+                    alert("There was an error processing your request. Please try again.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

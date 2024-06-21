@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Prices</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 7px 0 rgba(0, 0, 0, .4), 0 1px 7px 0 rgba(0, 0, 0, .4);
+            margin: 2.5rem 0;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 10px;
+            width: 80%;
+            margin: 2.5rem auto;
+            flex-direction: row;
+        }
+        .airline-logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 1rem;
+        }
+        .card__header {
+            display: flex;
+            align-items: center;
+        }
+        .card__details {
+            display: flex;
+            align-items: center;
+        }
+        .detail {
+            margin: 0 1rem;
+            text-align: center;
+        }
+        .form-wrapper {
+            width: 80%;
+            margin: 2.5rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 1px 7px 0 rgba(0, 0, 0, .4), 0 1px 7px 0 rgba(0, 0, 0, .4);
+        }
+        .form-wrapper label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .form-wrapper input, .form-wrapper button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .price-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .price {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .book-button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="flightCards"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const imageDirectory = 'path/to/images/'; // Directory where your images are stored
+
+        const airlineImages = {
+            'I5': 'I5.png',
+            '6E': '6E.png',
+            'IX': 'IX.png',
+            'AI': 'AI.png'
+        };
+
+        async function fetchFlightPrices(origin, destination) {
+            const options = {
+                method: 'GET',
+                url: 'https://travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com/v2/prices/nearest-places-matrix',
+                params: {
+                    origin: origin,
+                    destination: destination,
+                    flexibility: '0',
+                    currency: 'INR',
+                    show_to_affiliates: 'true',
+                    limit: '10',
+                    distance: '100'
+                },
+                headers: {
+                    'X-Access-Token': 'daba2c15e246a89e1662278b0b26082b',
+                    'X-RapidAPI-Key': 'f4271e8cb0mshc5c0510eee36b1bp19cf55jsna823e973dbe7',
+                    'X-RapidAPI-Host': 'travelpayouts-travelpayouts-flight-data-v1.p.rapidapi.com'
+                }
+            };
+
+            try {
+                const response = await axios.request(options);
+                const flights = response.data.prices || [];
+                const formattedFlights = flights.map(flight => ({
+                    From: flight.origin,
+                    To: flight.destination,
+                    Airline: flight.main_airline,
+                    Departure_Date: new Date(flight.depart_date).toDateString(),
+                    Departure: new Date(flight.depart_date).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }),
+                    Arrival: new Date(new Date(flight.depart_date).getTime() + flight.duration * 60000).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }),
+                    Duration: `${Math.floor(flight.duration / 60)}h ${flight.duration % 60}m`,
+                    Price: `₹${flight.price}`
+                }));
+
+                const flightCards = document.getElementById('flightCards');
+                flightCards.innerHTML = ''; // Clear previous data
+                formattedFlights.forEach(flight => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const header = document.createElement('div');
+                    header.className = 'card__header';
+
+                    const airlineLogo = document.createElement('img');
+                    airlineLogo.className = 'airline-logo';
+                    airlineLogo.src = airlineImages[flight.Airline] || 'https://via.placeholder.com/50x50?text=Airline';
+                    header.appendChild(airlineLogo);
+
+                    const details = document.createElement('div');
+                    details.className = 'card__details';
+                    details.innerHTML = `
+                        <div class="detail">${flight.From} to ${flight.To}</div>
+                        <div class="detail">${flight.Airline}</div>
+                        <div class="detail">${flight.Departure} - ${flight.Arrival}</div>
+                        <div class="detail">${flight.Duration}</div>
+                    `;
+                    header.appendChild(details);
+
+                    const priceButton = document.createElement('div');
+                    priceButton.className = 'price-button';
+                    priceButton.innerHTML = `
+                        <div class="price">${flight.Price}</div>
+                        <button class="book-button" onclick="bookFlight('${flight.Airline}', '${flight.From}', '${flight.To}', '${flight.Departure}', '${flight.Arrival}', '${flight.Price}')">Book</button>
+                    `;
+                    card.appendChild(header);
+                    card.appendChild(priceButton);
+
+                    flightCards.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error fetching flight prices:', error);
+                document.getElementById('flightCards').innerHTML = '<p>Error fetching flight prices. Please try again later.</p>';
+            }
+        }
+
+        function bookFlight(airline, from, to, departure, arrival, price) {
+            localStorage.setItem('airline', airline);
+            localStorage.setItem('from', from);
+            localStorage.setItem('to', to);
+            localStorage.setItem('departure', departure);
+            localStorage.setItem('arrival', arrival);
+            localStorage.setItem('price', price);
+            window.location.href = '/product';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const origin = localStorage.getItem('origin');
+            const destination = localStorage.getItem('destination');
+            if (origin && destination) {
+                fetchFlightPrices(origin, destination);
+            }
+        });
+    </script>
+</body>
+</html>
